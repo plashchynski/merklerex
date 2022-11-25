@@ -1,22 +1,31 @@
+#include "MerkelMain.h"
 #include <iostream>
 #include <vector>
-#include "MerkelMain.h"
 #include "OrderBookEntry.h"
+#include "CSVReader.h"
 
 MerkelMain::MerkelMain()
 {
+
+
 }
 
 void MerkelMain::init()
 {
     loadOrderBook();
     int input;
-    while (true)
+    while(true)
     {
         printMenu();
         input = getUserOption();
         processUserOption(input);
     }
+}
+
+void MerkelMain::loadOrderBook()
+{
+    orders = CSVReader::readCSV("20200317.csv"); 
+    //orders = CSVReader::readCSV("big_data.csv"); 
     
 }
 
@@ -43,65 +52,24 @@ void MerkelMain::printHelp()
     std::cout << "Help - your aim is to make money. Analyse the market and make bids and offers. " << std::endl;
 }
 
-double computeLowPrice(std::vector<OrderBookEntry>& entries)
+void MerkelMain::printMarketStats()
 {
-    double lowPrice = entries[0].price;
-
-    for (unsigned int i = 1; i < entries.size(); ++i)
+    std::cout << "OrderBook contains :  " << orders.size() << " entries" << std::endl;
+    unsigned int bids = 0;
+    unsigned int asks = 0;
+    for (OrderBookEntry& e : orders)
     {
-        if (entries[i].price < lowPrice)
+        if (e.orderType == OrderBookType::ask)
         {
-            lowPrice = entries[i].price;
+            asks ++;
         }
-    }
-
-    return lowPrice;
-}
-
-double computeHighPrice(std::vector<OrderBookEntry>& entries)
-{
-    double highPrice = entries[0].price;
-
-    for (unsigned int i = 1; i < entries.size(); ++i)
-    {
-        if (entries[i].price > highPrice)
+        if (e.orderType == OrderBookType::bid)
         {
-            highPrice = entries[i].price;
-        }
-    }
+            bids ++;
+        }  
+    }    
+    std::cout << "OrderBook asks:  " << asks << " bids:" << bids << std::endl;
 
-    return highPrice;
-}
-
-double computeAveragePrice(std::vector<OrderBookEntry>& entries)
-{
-    double sum = 0;
-
-    for (OrderBookEntry& entry : entries)
-    {
-        sum += entry.price;
-    }
-
-    return (sum / entries.size());
-}
-
-
-double computePriceSpread(std::vector<OrderBookEntry>& entries)
-{
-    double lowPrice = computeLowPrice(entries);
-    double highPrice = computeHighPrice(entries);
-
-    return (highPrice - lowPrice);
-}
-
-void  MerkelMain::printMarketStats()
-{
-    std::cout << "Order book contains: " << orders.size() << " entries." << std::endl;
-
-    std::cout << "The average price is: " << computeAveragePrice(orders) << std::endl;
-    std::cout << "The low price is: " << computeLowPrice(orders) << std::endl;
-    std::cout << "The high price is: " << computeHighPrice(orders) << std::endl;
-    std::cout << "The price spread is: " << computePriceSpread(orders) << std::endl;
 }
 
 void MerkelMain::enterOffer()
@@ -140,36 +108,29 @@ void MerkelMain::processUserOption(int userOption)
     {
         std::cout << "Invalid choice. Choose 1-6" << std::endl;
     }
-    if (userOption == 1) // bad input
+    if (userOption == 1) 
     {
         printHelp();
     }
-    if (userOption == 2) // bad input
+    if (userOption == 2) 
     {
         printMarketStats();
     }
-    if (userOption == 3) // bad input
+    if (userOption == 3) 
     {
         enterOffer();
     }
-    if (userOption == 4) // bad input
+    if (userOption == 4) 
     {
         enterBid();
     }
-    if (userOption == 5) // bad input
+    if (userOption == 5) 
     {
         printWallet();
     }
-    if (userOption == 6) // bad input
+    if (userOption == 6) 
     {
         gotoNextTimeframe();
     }       
 }
-
-void MerkelMain::loadOrderBook()
-{
-    orders.push_back(OrderBookEntry{100.0, 1.0, "2018-01-01 12:00:00", "BTC/USD", OrderBookType::bid});
-    orders.push_back(OrderBookEntry{101.0, 1.0, "2018-01-01 12:00:00", "BTC/USD", OrderBookType::bid});
-    orders.push_back(OrderBookEntry{112.0, 1.0, "2018-01-01 12:00:00", "BTC/USD", OrderBookType::bid});
-    orders.push_back(OrderBookEntry{132.0, 1.0, "2018-01-01 12:00:00", "BTC/USD", OrderBookType::bid});
-}
+ 

@@ -7,9 +7,9 @@ class MerkelMain
 {
     public:
         MerkelMain();
-        /* Call this to start the sim */
+        /** Call this to start the sim */
         void init();
-    private:
+    private: 
         void loadOrderBook();
         void printMenu();
         void printHelp();
@@ -21,5 +21,7 @@ class MerkelMain
         int getUserOption();
         void processUserOption(int userOption);
 
+
         std::vector<OrderBookEntry> orders;
-};
+
+}; 
