@@ -2,6 +2,7 @@
 
 #include <vector>
 #include "OrderBookEntry.h"
+#include "OrderBook.h"
 
 class MerkelMain
 {
@@ -9,8 +10,7 @@ class MerkelMain
         MerkelMain();
         /** Call this to start the sim */
         void init();
-    private: 
-        void loadOrderBook();
+    private:
         void printMenu();
         void printHelp();
         void printMarketStats();
@@ -21,7 +21,6 @@ class MerkelMain
         int getUserOption();
         void processUserOption(int userOption);
 
-
-        std::vector<OrderBookEntry> orders;
-
+        std::string currentTime;
+        OrderBook orderBook{"20200317.csv"};
 }; 

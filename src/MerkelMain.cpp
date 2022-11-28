@@ -12,21 +12,14 @@ MerkelMain::MerkelMain()
 
 void MerkelMain::init()
 {
-    loadOrderBook();
     int input;
+    currentTime = orderBook.getEarliestTime();
     while(true)
     {
         printMenu();
         input = getUserOption();
         processUserOption(input);
     }
-}
-
-void MerkelMain::loadOrderBook()
-{
-    orders = CSVReader::readCSV("20200317.csv"); 
-    //orders = CSVReader::readCSV("big_data.csv"); 
-    
 }
 
 void MerkelMain::printMenu()
@@ -54,22 +47,19 @@ void MerkelMain::printHelp()
 
 void MerkelMain::printMarketStats()
 {
-    std::cout << "OrderBook contains :  " << orders.size() << " entries" << std::endl;
-    unsigned int bids = 0;
-    unsigned int asks = 0;
-    for (OrderBookEntry& e : orders)
+    for (const std::string & product : orderBook.getKnownProducts())
     {
-        if (e.orderType == OrderBookType::ask)
-        {
-            asks ++;
-        }
-        if (e.orderType == OrderBookType::bid)
-        {
-            bids ++;
-        }  
-    }    
-    std::cout << "OrderBook asks:  " << asks << " bids:" << bids << std::endl;
+        std::cout << "Product " << product << std::endl;
 
+        std::vector<OrderBookEntry> entries = orderBook.getOrders(
+            OrderBookType::bid, product, currentTime);
+
+        std::cout << "Asks seen: " << entries.size() << std::endl;
+        std::cout << "Max ask : " << OrderBook::getHighPrice(entries) << std::endl;
+        std::cout << "Min ask : " << OrderBook::getLowPrice(entries) << std::endl;
+        std::cout << "Mean ask : " << OrderBook::getMeanPrice(entries) << std::endl;
+        std::cout << "STD ask : " << OrderBook::getStdPrice(entries) << std::endl;
+    }    
 }
 
 void MerkelMain::enterOffer()
@@ -90,6 +80,8 @@ void MerkelMain::printWallet()
 void MerkelMain::gotoNextTimeframe()
 {
     std::cout << "Going to next time frame. " << std::endl;
+    currentTime = orderBook.getNextTime(currentTime);
+    std::cout << "Current time is: " << currentTime << std::endl;
 }
  
 int MerkelMain::getUserOption()
