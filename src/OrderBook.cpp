@@ -1,3 +1,4 @@
+#include <iostream>
 #include <vector>
 #include <map>
 #include <cmath>
@@ -119,4 +120,16 @@ std::string OrderBook::getNextTime(std::string timestamp)
     next_time_stamp = orders[0].timestamp;
   }
   return next_time_stamp;
+}
+
+void OrderBook::insertOrder(OrderBookEntry& order)
+{
+  std::cout << "aaa" << std::endl;
+  orders.push_back(order);
+  std::sort(orders.begin(), orders.end(), OrderBookEntry::compareByTimestamps);
+}
+
+std::vector<OrderBookEntry> matchAsksToBids(std::string product, std::string timestamp)
+{
+  
 }

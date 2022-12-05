@@ -52,7 +52,7 @@ void MerkelMain::printMarketStats()
         std::cout << "Product " << product << std::endl;
 
         std::vector<OrderBookEntry> entries = orderBook.getOrders(
-            OrderBookType::bid, product, currentTime);
+            OrderBookType::ask, product, currentTime);
 
         std::cout << "Asks seen: " << entries.size() << std::endl;
         std::cout << "Max ask : " << OrderBook::getHighPrice(entries) << std::endl;
@@ -64,7 +64,27 @@ void MerkelMain::printMarketStats()
 
 void MerkelMain::enterOffer()
 {
-    std::cout << "Mark and offer - enter the amount " << std::endl;
+    std::cout << "Mark and offer - enter the amount: product,price,amount " << std::endl;
+    std::string input;
+
+    std::getline(std::cin, input);
+
+    std::vector<std::string> tokens = CSVReader::tokenise(input, ',');
+    if (tokens.size() != 3)
+    {
+        std::cout << "Bad input:" << input << std::endl;
+        return;
+    } else {
+        try {
+            OrderBookEntry obe = CSVReader::stringsToOBE(tokens[1], tokens[2],
+                                            currentTime, tokens[0], OrderBookType::ask);
+            orderBook.insertOrder(obe);
+        } catch(const std::exception& e)
+        {
+            std::cout << "Bad input:" << input << std::endl;
+            return;
+        }   
+    }
 }
 
 void MerkelMain::enterBid()
@@ -80,6 +100,16 @@ void MerkelMain::printWallet()
 void MerkelMain::gotoNextTimeframe()
 {
     std::cout << "Going to next time frame. " << std::endl;
+    for (std::string& p : orderBook.getKnownProducts())
+    {
+        std::cout << "matching " << p << std::endl;
+        std::vector<OrderBookEntry> sales = orderBook.matchAsksToBids(p, currentTime);
+        std::cout << "Sales: " << sales.size() << std::endl;
+        for (OrderBookEntry& sale : sales)
+        {
+            std::cout << "Sale price: " << sale.price << " amount " << sale.amount << std::endl;
+        }
+    }
     currentTime = orderBook.getNextTime(currentTime);
     std::cout << "Current time is: " << currentTime << std::endl;
 }
@@ -87,9 +117,20 @@ void MerkelMain::gotoNextTimeframe()
 int MerkelMain::getUserOption()
 {
     int userOption;
+    std::string line;
 
     std::cout << "Type in 1-6" << std::endl;
-    std::cin >> userOption;
+
+    std::getline(std::cin, line);
+
+    try {
+        userOption = std::stoi(line);
+    } catch(const std::exception& e)
+    {
+        std::cout << "Bad input:" << line << std::endl;
+        return 0;
+    }
+
     std::cout << "You chose: " << userOption << std::endl;
     return userOption;
 }

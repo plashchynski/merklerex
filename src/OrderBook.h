@@ -20,6 +20,8 @@ class OrderBook
     static double getStdPrice(std::vector<OrderBookEntry> & orders);
     std::string getEarliestTime();
     std::string getNextTime(std::string timestamp);
+    void insertOrder(OrderBookEntry& order);
+    std::vector<OrderBookEntry> matchAsksToBids(std::string product, std::string timestamp);
   private:
     std::vector<OrderBookEntry> orders;
 };
