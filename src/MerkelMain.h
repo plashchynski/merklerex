@@ -10,11 +10,11 @@ class MerkelMain
         MerkelMain();
         /** Call this to start the sim */
         void init();
-    private:
+    private: 
         void printMenu();
         void printHelp();
         void printMarketStats();
-        void enterOffer();
+        void enterAsk();
         void enterBid();
         void printWallet();
         void gotoNextTimeframe();
@@ -22,5 +22,7 @@ class MerkelMain
         void processUserOption(int userOption);
 
         std::string currentTime;
+
         OrderBook orderBook{"20200317.csv"};
-}; 
+
+};

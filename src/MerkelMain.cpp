@@ -22,6 +22,7 @@ void MerkelMain::init()
     }
 }
 
+
 void MerkelMain::printMenu()
 {
     // 1 print help
@@ -29,7 +30,7 @@ void MerkelMain::printMenu()
     // 2 print exchange stats
     std::cout << "2: Print exchange stats" << std::endl;
     // 3 make an offer
-    std::cout << "3: Make an offer " << std::endl;
+    std::cout << "3: Make an ask " << std::endl;
     // 4 make a bid 
     std::cout << "4: Make a bid " << std::endl;
     // 5 print wallet
@@ -38,6 +39,8 @@ void MerkelMain::printMenu()
     std::cout << "6: Continue " << std::endl;
 
     std::cout << "============== " << std::endl;
+
+    std::cout << "Current time is: " << currentTime << std::endl;
 }
 
 void MerkelMain::printHelp()
@@ -47,44 +50,46 @@ void MerkelMain::printHelp()
 
 void MerkelMain::printMarketStats()
 {
-    for (const std::string & product : orderBook.getKnownProducts())
+    for (std::string const& p : orderBook.getKnownProducts())
     {
-        std::cout << "Product " << product << std::endl;
-
-        std::vector<OrderBookEntry> entries = orderBook.getOrders(
-            OrderBookType::ask, product, currentTime);
-
+        std::cout << "Product: " << p << std::endl;
+        std::vector<OrderBookEntry> entries = orderBook.getOrders(OrderBookType::ask, 
+                                                                p, currentTime);
         std::cout << "Asks seen: " << entries.size() << std::endl;
-        std::cout << "Max ask : " << OrderBook::getHighPrice(entries) << std::endl;
-        std::cout << "Min ask : " << OrderBook::getLowPrice(entries) << std::endl;
-        std::cout << "Mean ask : " << OrderBook::getMeanPrice(entries) << std::endl;
-        std::cout << "STD ask : " << OrderBook::getStdPrice(entries) << std::endl;
-    }    
+        std::cout << "Max ask: " << OrderBook::getHighPrice(entries) << std::endl;
+        std::cout << "Min ask: " << OrderBook::getLowPrice(entries) << std::endl;
+    }
+
 }
 
-void MerkelMain::enterOffer()
+void MerkelMain::enterAsk()
 {
-    std::cout << "Mark and offer - enter the amount: product,price,amount " << std::endl;
+    std::cout << "Make an ask - enter the amount: product,price, amount, eg  ETH/BTC,200,0.5" << std::endl;
     std::string input;
-
     std::getline(std::cin, input);
 
     std::vector<std::string> tokens = CSVReader::tokenise(input, ',');
     if (tokens.size() != 3)
     {
-        std::cout << "Bad input:" << input << std::endl;
-        return;
-    } else {
+        std::cout << "MerkelMain::enterAsk Bad input! " << input << std::endl;
+    }
+    else {
         try {
-            OrderBookEntry obe = CSVReader::stringsToOBE(tokens[1], tokens[2],
-                                            currentTime, tokens[0], OrderBookType::ask);
+            OrderBookEntry obe = CSVReader::stringsToOBE(
+                tokens[1],
+                tokens[2], 
+                currentTime, 
+                tokens[0], 
+                OrderBookType::ask 
+            );
             orderBook.insertOrder(obe);
-        } catch(const std::exception& e)
+        }catch (const std::exception& e)
         {
-            std::cout << "Bad input:" << input << std::endl;
-            return;
+            std::cout << " MerkelMain::enterAsk Bad input " << std::endl;
         }   
     }
+
+    std::cout << "You typed: " << input << std::endl;
 }
 
 void MerkelMain::enterBid()
@@ -103,34 +108,28 @@ void MerkelMain::gotoNextTimeframe()
     for (std::string& p : orderBook.getKnownProducts())
     {
         std::cout << "matching " << p << std::endl;
-        std::vector<OrderBookEntry> sales = orderBook.matchAsksToBids(p, currentTime);
+        std::vector<OrderBookEntry> sales =  orderBook.matchAsksToBids(p, currentTime);
         std::cout << "Sales: " << sales.size() << std::endl;
         for (OrderBookEntry& sale : sales)
         {
-            std::cout << "Sale price: " << sale.price << " amount " << sale.amount << std::endl;
+            std::cout << "Sale price: " << sale.price << " amount " << sale.amount << std::endl; 
         }
     }
     currentTime = orderBook.getNextTime(currentTime);
-    std::cout << "Current time is: " << currentTime << std::endl;
 }
  
 int MerkelMain::getUserOption()
 {
-    int userOption;
+    int userOption = 0;
     std::string line;
-
     std::cout << "Type in 1-6" << std::endl;
-
     std::getline(std::cin, line);
-
-    try {
+    try{
         userOption = std::stoi(line);
-    } catch(const std::exception& e)
+    }catch(const std::exception& e)
     {
-        std::cout << "Bad input:" << line << std::endl;
-        return 0;
+        // 
     }
-
     std::cout << "You chose: " << userOption << std::endl;
     return userOption;
 }
@@ -151,7 +150,7 @@ void MerkelMain::processUserOption(int userOption)
     }
     if (userOption == 3) 
     {
-        enterOffer();
+        enterAsk();
     }
     if (userOption == 4) 
     {
@@ -166,4 +165,3 @@ void MerkelMain::processUserOption(int userOption)
         gotoNextTimeframe();
     }       
 }
- 

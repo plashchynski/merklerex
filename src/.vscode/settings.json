@@ -104,6 +104,7 @@
         "ctgmath": "cpp",
         "__memory": "cpp",
         "filesystem": "cpp",
-        "stack": "cpp"
+        "stack": "cpp",
+        "__tree": "cpp"
     }
 }

@@ -55,7 +55,7 @@ OrderBookEntry CSVReader::stringsToOBE(std::vector<std::string> tokens)
 
     if (tokens.size() != 5) // bad
     {
-        //std::cout << "Bad line " << std::endl;
+        std::cout << "Bad line " << std::endl;
         throw std::exception{};
     }
     // we have 5 tokens
@@ -76,28 +76,29 @@ OrderBookEntry CSVReader::stringsToOBE(std::vector<std::string> tokens)
 
     return obe; 
 }
-      
-OrderBookEntry CSVReader::stringsToOBE( std::string priceString,
-                                    std::string amountString,
-                                    std::string timestamp,
-                                    std::string product,
-                                    OrderBookType orderBookType)
+
+
+OrderBookEntry CSVReader::stringsToOBE(std::string priceString, 
+                                    std::string amountString, 
+                                    std::string timestamp, 
+                                    std::string product, 
+                                    OrderBookType orderType)
 {
-    double priceD, amountD;
+    double price, amount;
     try {
-        priceD = std::stod(priceString);
-        amountD = std::stod(amountString);
+         price = std::stod(priceString);
+         amount = std::stod(amountString);
     }catch(const std::exception& e){
-        std::cout << "CSVReader::stringsToOBE Bad float! " << priceString << std::endl;
-        std::cout << "CSVReader::stringsToOBE Bad float! " << amountString << std::endl; 
-        throw;
+        std::cout << "CSVReader::stringsToOBE Bad float! " << priceString<< std::endl;
+        std::cout << "CSVReader::stringsToOBE Bad float! " << amountString<< std::endl; 
+        throw;        
     }
-
-    OrderBookEntry obe{priceD, 
-                        amountD, 
-                        timestamp,
-                        product, 
-                        orderBookType};
-
+    OrderBookEntry obe{price, 
+                    amount, 
+                    timestamp,
+                    product, 
+                    orderType};
+                
     return obe;
 }
+     
